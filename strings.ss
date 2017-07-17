@@ -1,6 +1,7 @@
 (library (strings)
   (export string-replace
 	  string-replace/all
+	  string-split
 	  string-join)
   
   (import (chezscheme) (irregex) (srfi private let-opt))
@@ -12,6 +13,10 @@
   (define string-replace/all
     (lambda (s s1 s2)
       (irregex-replace/all s1 s s2)))
+
+  (define string-split
+    (lambda (s s1 . o)
+      (apply irregex-split s1 s o)))
   
 ; Alas, Scheme 48's APPLY blows up if you have many, many arguments.
 ;(define (string-concatenate strings) (apply string-append strings))
