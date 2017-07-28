@@ -3,7 +3,8 @@
 	  xinfo
 	  xerror
 	  xdebug
-	  xintent)
+	  xintent
+	  xshell)
 
   (import (chezscheme))
   
@@ -26,4 +27,15 @@
 
   (define xintent
     (lambda (segment msg . args)
-      (apply printf (format (format "~~,,~a@a\n" (* 4 segment)) msg) args))))
+      (apply printf (format (format "~~,,~a@a\n" (* 4 segment)) msg) args)))
+
+  (define xshell-debug
+    (lambda (cmd . args)
+       (newline)))
+  
+  (define xshell
+    (lambda (cmd . args)
+      (if (top-level-bound? 'DEBUG)
+	  (printf (apply format cmd args))
+	  (system (apply format cmd args)))
+      (newline))))
