@@ -1251,7 +1251,7 @@
 
   ;; (define lib (load-shared-object lib-name))
 
-  (define no-op (load-shared-object "libGL.so.1"))
+  (define no-op (load-shared-object "OpenGL.framework/OpenGL"))
 
   ;;;; Boolean values
   (define GL_FALSE #x0)

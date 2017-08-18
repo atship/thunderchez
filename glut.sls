@@ -192,7 +192,7 @@
   ;;           #f
   ;;           "can not locate GLUT library, unknown operating system"))))
 
-  (define no-op (load-shared-object "libglut.so.3"))
+  (define no-op (load-shared-object "GLUT.framework/GLUT"))
 
   ;; Display mode bit masks.
   (define GLUT_RGB                0)
@@ -286,7 +286,7 @@
     (syntax-rules (callback)
       ((_ ret name ((callback c-ret c-params)))
        (define name
-         (let ((f (foreign-procedure (symbol->string 'name) (int) ret)))
+         (let ((f (foreign-procedure (symbol->string 'name) (long) ret)))
            (lambda (proc)
              (let ((code (foreign-callable proc c-params c-ret)))
                (lock-object code)
