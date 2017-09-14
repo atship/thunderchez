@@ -2,7 +2,7 @@
   (export json-ref
           json-file->scm)
 
-  (import (chezscheme) (json))
+  (import (chezscheme) (json) (strings))
 
    (define json-ref
     (lambda (json k . ks)
@@ -19,13 +19,5 @@
   
     (define json-file->scm
       (lambda (file)
-        (json-string->scm (read-file file))))
-
-    (define (read-file filename)
-      (with-input-from-file filename
-        (lambda ()
-          (let loop ([x (read-char)] [acc '()])
-            (if (eof-object? x) (apply string (reverse acc))
-                (loop (read-char) (cons x acc)))))))
-    
+        (json-string->scm (file->string file))))
   )

@@ -3,7 +3,7 @@
   (import (chezscheme) (glut) (glu) (gl))
 
   (define glRender
-    (lambda (renderer)
+    (lambda (loader renderer)
       (begin 
 	(glutInit 0 0)
 
@@ -14,6 +14,8 @@
 	(glutCreateWindow "gl")
 
 	(glutDisplayFunc renderer)
+
+	(loader)
 
 	(glutMainLoop)
 
