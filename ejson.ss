@@ -9,7 +9,7 @@
       (cond ((hashtable? json)
 	     (cond ((null? k) json)
 		   ((null? ks) (hashtable-ref json k #f))
-		   (else (apply json-ref (hashtable-ref json k #f) (car ks) (cdr ks)))))
+		   (else (apply json-ref (hashtable-ref json (if (number? k) (string->symbol (number->string k)) k) #f) (car ks) (cdr ks)))))
 	    ((list? json)
 	     (cond ((null? k) json)
 		   ((null? ks) (list-ref json k))
