@@ -3,6 +3,7 @@
 	  string-replace/all
 	  string-split
 	  string-join
+	  string->file
 	  file->string)
   
   (import (chezscheme) (irregex) (srfi private let-opt))
@@ -13,6 +14,12 @@
           (let loop ([x (read-char)] [acc '()])
             (if (eof-object? x) (apply string (reverse acc))
                 (loop (read-char) (cons x acc)))))))
+
+  (define (string->file s filename)
+    (delete-file filename)
+    (call-with-output-file filename
+      (lambda (p)
+	(put-string p s))))
   
   (define string-replace
     (lambda (s s1 s2)
