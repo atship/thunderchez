@@ -1,9 +1,19 @@
 (library (ejson)
   (export json-ref
-	  scm->json-file
-          json-file->scm)
+	  json->ss
+	  ss->json
+	  ss->json-file
+          json-file->ss)
 
-  (import (chezscheme) (json) (strings))
+  (import (chezscheme) (json))
+
+  (define json->ss
+    (lambda (s)
+      (json-string->scm s)))
+
+  (define ss->json
+    (lambda (ss)
+      (scm->json-string ss)))
 
    (define json-ref
     (lambda (json k . ks)
@@ -17,12 +27,25 @@
 		   (else (apply json-ref (list-ref json k) (car ks) (cdr ks)))))
 	    (else (cond ((null? k) json)
 			(else (error 'json-ref (format "key: ~s not exists in last key's value ~s" k json))))))))
-  
-    (define json-file->scm
+
+   (define (file->string filename)
+      (call-with-input-file filename
+        (lambda (p)
+          (get-string-all p))))
+
+  (define (string->file s filename)
+    (delete-file filename)
+    (call-with-output-file filename
+      (lambda (p)
+	(put-string p s))))
+   
+    (define json-file->ss
       (lambda (file)
         (json-string->scm (file->string file))))
 
-    (define scm->json-file
-      (lambda (json file pretty)
-	(string->file (scm->json-string json #f pretty) file)))
+    (define ss->json-file
+      (case-lambda
+       ((json file) (ss->json-file json file #f))
+       ((json file pretty)
+	(string->file (scm->json-string json #f pretty) file))))
   )
