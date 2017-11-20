@@ -1,3 +1,4 @@
+#!chezscheme
 (library (xtool)
   (export xwarn
 	  xinfo
@@ -9,21 +10,21 @@
   (import (chezscheme))
   
   (define _fun_
-    (lambda (tag)
+    (lambda (tag color)
       (lambda (msg . args)
-	(apply printf (format "~a: ~a\n" tag msg) args))))
+	(apply printf (format "\033[3~am~a: ~a \033[0m\n" color tag msg) args))))
 
-  (define xwarn
-    (_fun_ "Warn"))
+  (define xwarn ; 3 is yellow
+    (_fun_ "Warn" 3))
 
-  (define xinfo
-    (_fun_ "Info"))
+  (define xinfo ; 2 is green
+    (_fun_ "Info" 2))
 
-  (define xerror
-    (_fun_ "Error"))
+  (define xerror ; 1 is red
+    (_fun_ "Error" 1))
 
-  (define xdebug
-    (_fun_ "Debug"))
+  (define xdebug  ; 6 is sky blue
+    (_fun_ "Debug" 6))
 
   (define xintent
     (lambda (segment msg . args)
