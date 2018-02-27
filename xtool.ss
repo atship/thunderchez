@@ -1,41 +1,33 @@
-(library (xtool)
-  (export xwarn
-	  xinfo
-	  xerror
-	  xdebug
-	  xintent
-	  xshell)
+#!chezscheme
+
+(library
+  (xtool)
+  (export logw
+          logi
+          loge
+          logd
+          tab)
 
   (import (chezscheme))
-  
+
   (define _fun_
-    (lambda (tag)
+    (lambda (tag color)
       (lambda (msg . args)
-	(apply printf (format "~a: ~a\n" tag msg) args))))
+        (apply printf (format "~a~a: ~a\033[0m\n" color tag msg) args))))
 
-  (define xwarn
-    (_fun_ "Warn"))
+  (define logw
+    (_fun_ "W" "\033[1;33m"))
 
-  (define xinfo
-    (_fun_ "Info"))
+  (define logi
+    (_fun_ "I" "\033[0m"))
 
-  (define xerror
-    (_fun_ "Error"))
+  (define loge
+    (_fun_ "E" "\033[1;31m"))
 
-  (define xdebug
-    (_fun_ "Debug"))
+  (define logd
+    (_fun_ "D" "\033[1;37m"))
 
-  (define xintent
+  (define tab
     (lambda (segment msg . args)
       (apply printf (format (format "~~,,~a@a\n" (* 4 segment)) msg) args)))
-
-  (define xshell-debug
-    (lambda (cmd . args)
-       (newline)))
-  
-  (define xshell
-    (lambda (cmd . args)
-      (if (top-level-bound? 'DEBUG)
-	  (printf (apply format cmd args))
-	  (system (apply format cmd args)))
-      (newline))))
+  )
