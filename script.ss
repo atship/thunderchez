@@ -21,9 +21,17 @@
           logw
           logi
           logd
-          tab)
+          tab
 
-  (import (chezscheme) (strings) (ejson) (xtool))
+          match
+          match-lambda
+          match-lambda*
+          match-let
+          match-let*
+          match-letrec
+          match-named-let)
+
+  (import (chezscheme) (strings) (ejson) (xtool) (matchable))
 
   (define (println f . args)
     (apply printf (format "~a\n" f) args)
