@@ -55,6 +55,12 @@
   (define-syntax string->iport (identifier-syntax open-string-input-port))
   (define-syntax string->oport (identifier-syntax open-string-output-port))
   (define-syntax ls (identifier-syntax directory-list))
-  (define-syntax xml->ss (identifier-syntax ssax:xml->sxml))
-  (define-syntax xml-ref (identifier-syntax sxpath))
+
+  (define xml->ss
+    (case-lambda
+      [(f) (xml->ss f '())]
+      [(f ns) (ssax:xml->sxml (file->utf8-iport f) ns)]))
+
+  (define (xml-ref xml path)
+    ((sxpath path) xml))
   )
