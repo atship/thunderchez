@@ -13,8 +13,9 @@
       (json-string->scm s)))
 
   (define ss->json
-    (lambda (ss)
-      (scm->json-string ss)))
+    (case-lambda
+      [(ss) (scm->json-string ss)]
+      [(ss pretty) (scm->json-string ss #f pretty)]))
 
   (define json-ref
     (lambda (json k . ks)
@@ -46,7 +47,7 @@
 
   (define ss->json-file
     (case-lambda
-      ((json file) (ss->json-file json file #f))
-      ((json file pretty)
-       (string->file (scm->json-string json #f pretty) file))))
+      [(json file) (ss->json-file json file #f)]
+      [(json file pretty)
+       (string->file (scm->json-string json #f pretty) file)]))
   )

@@ -34,9 +34,13 @@
           match-let
           match-let*
           match-letrec
-          match-named-let)
+          match-named-let
 
-  (import (chezscheme) (strings) (ejson) (xtool) (matchable))
+          xml->ss
+          xml-ref
+          )
+
+  (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
 
   (define (println f . args)
     (apply printf (format "~a\n" f) args)
@@ -51,4 +55,6 @@
   (define-syntax string->iport (identifier-syntax open-string-input-port))
   (define-syntax string->oport (identifier-syntax open-string-output-port))
   (define-syntax ls (identifier-syntax directory-list))
+  (define-syntax xml->ss (identifier-syntax ssax:xml->sxml))
+  (define-syntax xml-ref (identifier-syntax sxpath))
   )
