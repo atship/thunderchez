@@ -3,6 +3,7 @@
 (library
   (script)
   (export println
+          ls
 
           string-replace
           string-replace/all
@@ -10,6 +11,10 @@
           string-join
           string->file
           file->string
+          file->utf8-iport
+          file->utf8-oport
+          string->iport
+          string->oport
 
           json-ref
           ss->json-file
@@ -37,4 +42,13 @@
     (apply printf (format "~a\n" f) args)
     )
 
+  (define (file->utf8-iport f)
+    (open-file-input-port f (file-options) 'block (make-transcoder (utf-8-codec))))
+
+  (define (file->utf8-oport f)
+    (open-file-output-port f (file-options) 'block (make-transcoder (utf-8-codec))))
+
+  (define-syntax string->iport (identifier-syntax open-string-input-port))
+  (define-syntax string->oport (identifier-syntax open-string-output-port))
+  (define-syntax ls (identifier-syntax directory-list))
   )
