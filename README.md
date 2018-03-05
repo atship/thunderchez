@@ -12,6 +12,14 @@ or set the CHEZSCHEMELIBDIRS environment variable:
 	
 	CHEZSCHEMELIBDIRS=/path/to/thunderchez
 
+## Compile script.ss
+
+Because the script.ss import many other libraries, you can compile it into an so file for speed up import.
+
+```shell
+    scheme --script compile-script.ss
+```
+
 ## SRFI
 	
 Based on [surfage](https://github.com/dharmatech/surfage/) with minor changes
