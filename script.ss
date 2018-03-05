@@ -73,10 +73,10 @@
     (open-file-input-port f (file-options) 'block (make-transcoder (utf-8-codec))))
 
   (define (file->utf8-oport f)
-    (open-file-output-port f (file-options) 'block (make-transcoder (utf-8-codec))))
+    (open-file-output-port f (file-options replace) 'block (make-transcoder (utf-8-codec))))
 
   (define-syntax file->iport (identifier-syntax open-file-input-port))
-  (define-syntax (file->oport f)
+  (define (file->oport f)
     (open-file-output-port f (file-options replace) 'block))
   (define-syntax string->iport (identifier-syntax open-string-input-port))
   (define-syntax string->oport (identifier-syntax open-string-output-port))
