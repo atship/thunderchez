@@ -76,7 +76,8 @@
     (open-file-output-port f (file-options) 'block (make-transcoder (utf-8-codec))))
 
   (define-syntax file->iport (identifier-syntax open-file-input-port))
-  (define-syntax file->oport (identifier-syntax open-file-output-port))
+  (define-syntax (file->oport f)
+    (open-file-output-port f (file-options replace) 'block))
   (define-syntax string->iport (identifier-syntax open-string-input-port))
   (define-syntax string->oport (identifier-syntax open-string-output-port))
   (define-syntax ls (identifier-syntax directory-list))
