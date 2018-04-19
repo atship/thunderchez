@@ -4,6 +4,7 @@
   (script)
   (export println
           ls
+          shell
 
           string-replace
           string-replace/all
@@ -64,6 +65,9 @@
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
+
+  (define (shell f . args)
+    (system (apply format f args)))
 
   (define (println f . args)
     (apply printf (format "~a\n" f) args))
