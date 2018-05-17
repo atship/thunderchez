@@ -1,5 +1,4 @@
-(library
-  (ejson)
+(library (ejson)
   (export json-ref
           json->ss
           ss->json
