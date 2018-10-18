@@ -24,6 +24,8 @@
           json-ref
           json->file
           file->json
+          string->json
+          json->string
 
           loge
           logw
