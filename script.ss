@@ -16,14 +16,14 @@
           file->utf8-oport
           file->iport
           file->oport
+	        file-iclose
+	        file-oclose
           string->iport
           string->oport
 
           json-ref
-          ss->json-file
-          json-file->ss
-          ss->json
-          json->ss
+          json->file
+          file->json
 
           loge
           logw
@@ -50,6 +50,8 @@
           read-byte
           read-ubyte
           read-utf8
+          read-float
+          read-double
           write-utf8
           write-uint
           write-int
@@ -59,6 +61,8 @@
           write-short
           write-ubyte
           write-byte
+          write-float
+          write-double
 
           xml->ss
           xml-ref
@@ -83,6 +87,10 @@
   (define (file->oport f)
     (open-file-output-port f (file-options replace) 'block))
 
+  (define-syntax file-iclose (identifier-syntax close-input-port))
+
+  (define-syntax file-oclose (identifier-syntax close-output-port))
+  
   (define-syntax string->iport (identifier-syntax open-string-input-port))
 
   (define-syntax string->oport (identifier-syntax open-string-output-port))
@@ -116,6 +124,12 @@
 
   (define (read-ubyte port)
     (bytevector-u8-ref (read-bytes port 1) 0))
+
+  (define (read-float port)
+    (bytevector-ieee-single-ref (read-bytes port 4) 0 'little))
+
+  (define (read-double port)
+    (bytevector-ieee-double-ref (read-bytes port 8) 0 'little))
 
   (define (write-uint port i)
     (let ([bytes (make-bytevector 4)])
@@ -157,6 +171,16 @@
       (bytevector-u8-set! bytes 0 b)
       (write-bytes port bytes)))
 
+  (define (write-float port f)
+    (let ([bytes (make-bytevector 4)])
+      (bytevector-ieee-single-set! bytes 0 f 'little)
+      (write-bytes port bytes)))
+
+  (define (write-double port f)
+    (let ([bytes (make-bytevector 8)])
+      (bytevector-ieee-double-set! bytes 0 f 'little)
+      (write-bytes port bytes)))
+  
   (define read-utf8
     (case-lambda
       [(port) (let ([len (read-uint port)]) (read-utf8 port len))]
