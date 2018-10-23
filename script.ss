@@ -3,6 +3,7 @@
 (library
   (script)
   (export println
+          echo
           ls
           shell
 
@@ -65,6 +66,7 @@
           write-byte
           write-float
           write-double
+          eof?
 
           xml->ss
           xml-ref
@@ -74,6 +76,11 @@
 
   (define (shell f . args)
     (system (apply format f args)))
+
+  (define (echo o . args)
+    (printf "~a\n" o)
+    (if (not (null? args))
+        (apply echo (car args) (cdr args))))
 
   (define (println f . args)
     (apply printf (format "~a\n" f) args))
@@ -88,6 +95,8 @@
 
   (define (file->oport f)
     (open-file-output-port f (file-options replace) 'block))
+
+  (define-syntax eof? (identifier-syntax eof-object?))
 
   (define-syntax file-iclose (identifier-syntax close-input-port))
 
