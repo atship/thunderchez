@@ -30,6 +30,7 @@
           logi
           logd
           tab
+          int
 
           match
           match-lambda
@@ -65,6 +66,9 @@
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
+
+  (define (int i)
+    (inexact->exact (round i)))
 
   (define (shell f . args)
     (system (apply format f args)))
