@@ -17,10 +17,13 @@
           file->utf8-oport
           file->iport
           file->oport
-	        file-iclose
-	        file-oclose
+          file-iclose
+          file-oclose
           string->iport
           string->oport
+          string->code
+          eval-string
+          eval-list
 
           json-ref
           json->file
@@ -77,6 +80,15 @@
 
   (define (int i)
     (inexact->exact (round i)))
+
+  (define (string->code s)
+    (read (string->iport s)))
+
+  (define (eval-string s)
+    (eval (string->code s)))
+
+  (define (eval-list ls)
+    (eval-string (format "~a" ls)))
 
   (define (shell f . args)
     (system (apply format f args)))
