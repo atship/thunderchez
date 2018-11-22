@@ -72,7 +72,8 @@
           write-double
           eof?
 
-          xml->ss
+          file->xml
+		  xml->file
           xml-ref
           )
 
@@ -218,10 +219,53 @@
       (write-uint port (bytevector-length bytes))
       (write-bytes port bytes)))
 
-  (define xml->ss
+  (define file->xml
     (case-lambda
-      [(f) (xml->ss f '())]
+      [(f) (file->xml f '())]
       [(f ns) (ssax:xml->sxml (file->utf8-iport f) ns)]))
+	  
+  (define (xml->file xml file)
+    (string->file (xml->string xml) file))
+	
+  (define (xml->string xml)
+  (define (attr ls port)
+    (cond
+      [(null? ls) #f]
+      [else (let ([kv (car ls)])
+              (cond
+                [(null? (cdr kv)) (put-string port (format " ~a=\"\"" (car kv)))]
+                [else (put-string port (format " ~a=~s" (car kv) (car (cdr kv))))]))
+            (attr (cdr ls) port)]))
+  (define (node ls port)
+    (for-each (lambda (e)
+                (if (pair? e)
+                    (xml->string1 (car e) (cdr e) port)
+                    (put-string port e))) ls))
+  (define (child tag ls port)
+    (if (null? ls)
+        (put-string port " />")
+        (begin
+          (put-string port ">")
+          (node ls port)
+          (put-string port (format "</~a>" tag)))
+      ))
+  (define (xml->string1 tag xml port)
+    (echo tag)
+    (cond
+      [(equal? '*TOP* tag) (node xml port)]
+      [(equal? '*PI* tag) (put-string port (format "<?xml ~a?>" (string-join (cdr xml) " ")))]
+      [(null? xml) (put-string port (format "<~a />" tag))]
+      [else (put-string port (format "<~a" tag))
+            (cond
+              [(null? (car xml)) (put-string port ">")]
+              [(equal? '@ (caar xml))
+               (attr (cdar xml) port)
+               (child tag (cdr xml) port)]
+              [else
+                (child tag xml port)])]))
+  (let-values ([(p get) (string->oport)])
+    (xml->string1 (car xml) (cdr xml) p)
+    (get)))
 
   (define (xml-ref xml path)
     ((sxpath path) xml))
