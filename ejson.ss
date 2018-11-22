@@ -1,18 +1,17 @@
-(library
-  (ejson)
+(library (ejson)
   (export json-ref
-          json->ss
-          ss->json
-          ss->json-file
-          json-file->ss)
+          json->file
+          file->json
+          string->json
+          json->string)
 
   (import (chezscheme) (json))
 
-  (define json->ss
+  (define string->json
     (lambda (s)
       (json-string->scm s)))
 
-  (define ss->json
+  (define json->string
     (case-lambda
       [(ss) (scm->json-string ss)]
       [(ss pretty) (scm->json-string ss #f pretty)]))
@@ -41,13 +40,13 @@
       (lambda (p)
         (put-string p s))))
 
-  (define json-file->ss
+  (define file->json
     (lambda (file)
       (json-string->scm (file->string file))))
 
-  (define ss->json-file
+  (define json->file
     (case-lambda
-      [(json file) (ss->json-file json file #f)]
+      [(json file) (json->file json file #f)]
       [(json file pretty)
        (string->file (scm->json-string json #f pretty) file)]))
   )
