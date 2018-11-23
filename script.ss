@@ -120,7 +120,7 @@
   (define-syntax file-iclose (identifier-syntax close-input-port))
 
   (define-syntax file-oclose (identifier-syntax close-output-port))
-  
+
   (define-syntax string->iport (identifier-syntax open-string-input-port))
 
   (define-syntax string->oport (identifier-syntax open-string-output-port))
@@ -131,23 +131,35 @@
 
   (define-syntax write-bytes (identifier-syntax put-bytevector))
 
-  (define (read-int port)
-    (bytevector-s32-ref (read-bytes port 4) 0 'little))
+  (define read-int
+    (case-lambda
+      [(port) (read-int port #f)]
+      [(port big) (bytevector-s32-ref (read-bytes port 4) 0 (if big 'big 'little))]))
 
-  (define (read-uint port)
-    (bytevector-u32-ref (read-bytes port 4) 0 'little))
+  (define read-uint
+    (case-lambda
+      [(port) (read-uint port #f)]
+      [(port big) (bytevector-u32-ref (read-bytes port 4) 0 (if big 'big 'little))]))
 
-  (define (read-long port)
-    (bytevector-s64-ref (read-bytes port 8) 0 'little))
+  (define read-long
+    (case-lambda
+      [(port) (read-long port #f)]
+      [(port big) (bytevector-s64-ref (read-bytes port 8) 0 (if big 'big 'little))]))
 
-  (define (read-ulong port)
-    (bytevector-u64-ref (read-bytes port 8) 0 'little))
+  (define read-ulong
+    (case-lambda
+      [(port) (read-ulong port #f)]
+      [(port big) (bytevector-u64-ref (read-bytes port 8) 0 (if big 'big 'little))]))
 
-  (define (read-short port)
-    (bytevector-s16-ref (read-bytes port 2) 0 'little))
+  (define read-short
+    (case-lambda
+      [(port) (read-short port #f)]
+      [(port big) (bytevector-s16-ref (read-bytes port 2) 0 (if big 'big 'little))]))
 
-  (define (read-ushort port)
-    (bytevector-u16-ref (read-bytes port 2) 0 'little))
+  (define read-ushort
+    (case-lambda
+      [(port) (read-ushort port #f)]
+      [(port big) (bytevector-u16-ref (read-bytes port 2) 0 (if big 'big 'little))]))
 
   (define (read-byte port)
     (bytevector-s8-ref (read-bytes port 1) 0))
@@ -155,41 +167,57 @@
   (define (read-ubyte port)
     (bytevector-u8-ref (read-bytes port 1) 0))
 
-  (define (read-float port)
-    (bytevector-ieee-single-ref (read-bytes port 4) 0 'little))
+  (define read-float
+    (case-lambda
+      [(port) (read-float port #f)]
+      [(port big) (bytevector-ieee-single-ref (read-bytes port 4) 0 (if big 'big 'little))]))
 
-  (define (read-double port)
-    (bytevector-ieee-double-ref (read-bytes port 8) 0 'little))
+  (define read-double
+    (case-lambda
+      [(port) (read-double port #f)]
+      [(port big) (bytevector-ieee-double-ref (read-bytes port 8) 0 (if big 'big 'little))]))
 
-  (define (write-uint port i)
-    (let ([bytes (make-bytevector 4)])
-      (bytevector-u32-set! bytes 0 i 'little)
-      (write-bytes port bytes)))
+  (define write-uint
+    (case-lambda
+      [(port i) (write-uint port i #f)]
+      [(port i big) (let ([bytes (make-bytevector 4)])
+                      (bytevector-u32-set! bytes 0 i (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-int port i)
-    (let ([bytes (make-bytevector 4)])
-      (bytevector-s32-set! bytes 0 i 'little)
-      (write-bytes port bytes)))
+  (define write-int
+    (case-lambda
+      [(port i) (write-int port i #f)]
+      [(port i big) (let ([bytes (make-bytevector 4)])
+                      (bytevector-s32-set! bytes 0 i (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-ulong port l)
-    (let ([bytes (make-bytevector 8)])
-      (bytevector-u64-set! bytes 0 l 'little)
-      (write-bytes port bytes)))
+  (define write-ulong
+    (case-lambda
+      [(port i) (write-ulong port i #f)]
+      [(port i big) (let ([bytes (make-bytevector 8)])
+                      (bytevector-u64-set! bytes 0 i (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-long port l)
-    (let ([bytes (make-bytevector 8)])
-      (bytevector-s64-set! bytes 0 l 'little)
-      (write-bytes port bytes)))
+  (define write-long
+    (case-lambda
+      [(port i) (write-long port i #f)]
+      [(port i big) (let ([bytes (make-bytevector 8)])
+                      (bytevector-s64-set! bytes 0 i (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-short port s)
-    (let ([bytes (make-bytevector 2)])
-      (bytevector-s16-set! bytes 0 s 'little)
-      (write-bytes port bytes)))
+  (define write-short
+    (case-lambda
+      [(port i) (write-short port i #f)]
+      [(port i big) (let ([bytes (make-bytevector 2)])
+                      (bytevector-s16-set! bytes 0 i (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-ushort port s)
-    (let ([bytes (make-bytevector 2)])
-      (bytevector-u16-set! bytes 0 s 'little)
-      (write-bytes port bytes)))
+  (define write-ushort
+    (case-lambda
+      [(port s) (write-ushort port s #f)]
+      [(port s big) (let ([bytes (make-bytevector 2)])
+                      (bytevector-u16-set! bytes 0 s (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
   (define (write-byte port b)
     (let ([bytes (make-bytevector 1)])
@@ -201,16 +229,20 @@
       (bytevector-u8-set! bytes 0 b)
       (write-bytes port bytes)))
 
-  (define (write-float port f)
-    (let ([bytes (make-bytevector 4)])
-      (bytevector-ieee-single-set! bytes 0 f 'little)
-      (write-bytes port bytes)))
+  (define write-float
+    (case-lambda
+      [(port f) (write-float port f #f)]
+      [(port f big) (let ([bytes (make-bytevector 4)])
+                      (bytevector-ieee-single-set! bytes 0 f (if big 'big 'little))
+                      (write-bytes port bytes))]))
 
-  (define (write-double port f)
-    (let ([bytes (make-bytevector 8)])
-      (bytevector-ieee-double-set! bytes 0 f 'little)
-      (write-bytes port bytes)))
-  
+  (define write-double
+    (case-lambda
+      [(port f) (write-double port f #f)]
+      [(port f big) (let ([bytes (make-bytevector 8)])
+                      (bytevector-ieee-double-set! bytes 0 f (if big 'big 'little))
+                      (write-bytes port bytes))]))
+
   (define read-utf8
     (case-lambda
       [(port) (let ([len (read-uint port)]) (read-utf8 port len))]
@@ -223,8 +255,8 @@
 
   (define string->xml
     (case-lambda
-    [(f) (string->xml f '())]
-    [(f ns) (ssax:xml->sxml (string->iport f) ns)]))
+      [(f) (string->xml f '())]
+      [(f ns) (ssax:xml->sxml (string->iport f) ns)]))
 
   (define file->xml
     (case-lambda
@@ -235,43 +267,43 @@
     (string->file (xml->string xml) file))
 
   (define (xml->string xml)
-  (define (attr ls port)
-    (cond
-      [(null? ls) #f]
-      [else (let ([kv (car ls)])
+    (define (attr ls port)
+      (cond
+        [(null? ls) #f]
+        [else (let ([kv (car ls)])
+                (cond
+                  [(null? (cdr kv)) (put-string port (format " ~a=\"\"" (car kv)))]
+                  [else (put-string port (format " ~a=\"~a\"" (car kv) (car (cdr kv))))]))
+              (attr (cdr ls) port)]))
+    (define (node ls port)
+      (for-each (lambda (e)
+                  (if (pair? e)
+                      (xml->string1 (car e) (cdr e) port)
+                      (put-string port (format "~a" e)))) ls))
+    (define (child tag ls port)
+      (if (null? ls)
+          (put-string port " />")
+          (begin
+            (put-string port ">")
+            (node ls port)
+            (put-string port (format "</~a>" tag)))
+        ))
+    (define (xml->string1 tag xml port)
+      (echo tag)
+      (cond
+        [(equal? '*TOP* tag) (node xml port)]
+        [(equal? '*PI* tag) (put-string port (format "<?xml ~a?>" (string-join (cdr xml) " ")))]
+        [(null? xml) (put-string port (format "<~a />" tag))]
+        [else (put-string port (format "<~a" tag))
               (cond
-                [(null? (cdr kv)) (put-string port (format " ~a=\"\"" (car kv)))]
-                [else (put-string port (format " ~a=\"~a\"" (car kv) (car (cdr kv))))]))
-            (attr (cdr ls) port)]))
-  (define (node ls port)
-    (for-each (lambda (e)
-                (if (pair? e)
-                    (xml->string1 (car e) (cdr e) port)
-                    (put-string port (format "~a" e)))) ls))
-  (define (child tag ls port)
-    (if (null? ls)
-        (put-string port " />")
-        (begin
-          (put-string port ">")
-          (node ls port)
-          (put-string port (format "</~a>" tag)))
-      ))
-  (define (xml->string1 tag xml port)
-    (echo tag)
-    (cond
-      [(equal? '*TOP* tag) (node xml port)]
-      [(equal? '*PI* tag) (put-string port (format "<?xml ~a?>" (string-join (cdr xml) " ")))]
-      [(null? xml) (put-string port (format "<~a />" tag))]
-      [else (put-string port (format "<~a" tag))
-            (cond
-              [(and (pair? (car xml)) (equal? '@ (caar xml)))
-               (attr (cdar xml) port)
-               (child tag (cdr xml) port)]
-              [else
-                (child tag xml port)])]))
-  (let-values ([(p get) (string->oport)])
-    (xml->string1 (car xml) (cdr xml) p)
-    (get)))
+                [(and (pair? (car xml)) (equal? '@ (caar xml)))
+                 (attr (cdar xml) port)
+                 (child tag (cdr xml) port)]
+                [else
+                  (child tag xml port)])]))
+    (let-values ([(p get) (string->oport)])
+      (xml->string1 (car xml) (cdr xml) p)
+      (get)))
 
   (define (xml-ref xml path)
     ((sxpath path) xml))
