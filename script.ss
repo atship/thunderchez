@@ -72,8 +72,10 @@
           write-double
           eof?
 
+          string->xml
           file->xml
-		  xml->file
+          xml->file
+          xml->string
           xml-ref
           )
 
@@ -219,14 +221,19 @@
       (write-uint port (bytevector-length bytes))
       (write-bytes port bytes)))
 
+  (define string->xml
+    (case-lambda
+    [(f) (string->xml f '())]
+    [(f ns) (ssax:xml->sxml (string->iport f) ns)]))
+
   (define file->xml
     (case-lambda
       [(f) (file->xml f '())]
       [(f ns) (ssax:xml->sxml (file->utf8-iport f) ns)]))
-	  
+
   (define (xml->file xml file)
     (string->file (xml->string xml) file))
-	
+
   (define (xml->string xml)
   (define (attr ls port)
     (cond
