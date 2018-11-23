@@ -234,13 +234,13 @@
       [else (let ([kv (car ls)])
               (cond
                 [(null? (cdr kv)) (put-string port (format " ~a=\"\"" (car kv)))]
-                [else (put-string port (format " ~a=~s" (car kv) (car (cdr kv))))]))
+                [else (put-string port (format " ~a=\"~a\"" (car kv) (car (cdr kv))))]))
             (attr (cdr ls) port)]))
   (define (node ls port)
     (for-each (lambda (e)
                 (if (pair? e)
                     (xml->string1 (car e) (cdr e) port)
-                    (put-string port e))) ls))
+                    (put-string port (format "~a" e)))) ls))
   (define (child tag ls port)
     (if (null? ls)
         (put-string port " />")
@@ -257,8 +257,7 @@
       [(null? xml) (put-string port (format "<~a />" tag))]
       [else (put-string port (format "<~a" tag))
             (cond
-              [(null? (car xml)) (put-string port ">")]
-              [(equal? '@ (caar xml))
+              [(and (pair? (car xml)) (equal? '@ (caar xml)))
                (attr (cdar xml) port)
                (child tag (cdr xml) port)]
               [else
