@@ -287,7 +287,7 @@
              (put-string port (format "~a" (car ls)))]
             [(eqv? '@ (caar ls))
              (attr (cdar ls) port)
-             (if (null? (cdar ls))
+             (if (null? (cdr ls))
                  (put-string port "/>")
                  (put-string port ">"))]
             [else (node (car ls) port)])
