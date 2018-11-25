@@ -40,12 +40,12 @@
 ;;; to avoid non-R5RS dependencies.
 (define (string-concatenate strings)
   (let* ((total (do ((strings strings (cdr strings))
-		     (i 0 (+ i (string-length (car strings)))))
+		     (i 0 (+ i (string-length (format "~a" (car strings))))))
 		    ((not (pair? strings)) i)))
 	 (ans (make-string total)))
     (let lp ((i 0) (strings strings))
       (if (pair? strings)
-	  (let* ((s (car strings))
+	  (let* ((s (format "~a" (car strings)))
 		 (slen (string-length s)))
 	    (%string-copy! ans i s 0 slen)
 	    (lp (+ i slen) (cdr strings)))))
@@ -86,7 +86,7 @@
     (let ((buildit (lambda (lis final)
 		     (let recur ((lis lis))
 		       (if (pair? lis)
-			   (cons delim (cons (car lis) (recur (cdr lis))))
+			   (cons delim (cons (format "~a" (car lis)) (recur (cdr lis))))
 			   final)))))
 
       (cond ((pair? strings)

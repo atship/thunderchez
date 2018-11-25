@@ -267,42 +267,49 @@
     (string->file (xml->string xml) file))
 
   (define (xml->string xml)
+    (define (has-attr cs)
+      (and (not (null? cs)) (not (null? (car cs))) (eqv? '@ (caar cs))))
     (define (attr ls port)
       (cond
         [(null? ls) #f]
-        [else (let ([kv (car ls)])
-                (cond
-                  [(null? (cdr kv)) (put-string port (format " ~a=\"\"" (car kv)))]
-                  [else (put-string port (format " ~a=\"~a\"" (car kv) (car (cdr kv))))]))
+        [(atom? (car ls))
+         (if (null? (cdr ls))
+             (put-string port (format " ~a=\"\"" (car ls)))
+             (put-string port (format " ~a=\"~a\"" (car ls) (cadr ls))))]
+        [else (attr (car ls) port)
               (attr (cdr ls) port)]))
-    (define (node ls port)
-      (for-each (lambda (e)
-                  (if (pair? e)
-                      (xml->string1 (car e) (cdr e) port)
-                      (put-string port (format "~a" e)))) ls))
-    (define (child tag ls port)
-      (if (null? ls)
-          (put-string port " />")
-          (begin
-            (put-string port ">")
-            (node ls port)
-            (put-string port (format "</~a>" tag)))
-        ))
-    (define (xml->string1 tag xml port)
-      (echo tag)
+    (define (child ls port)
       (cond
-        [(equal? '*TOP* tag) (node xml port)]
-        [(equal? '*PI* tag) (put-string port (format "<?xml ~a?>" (string-join (cdr xml) " ")))]
-        [(null? xml) (put-string port (format "<~a />" tag))]
-        [else (put-string port (format "<~a" tag))
-              (cond
-                [(and (pair? (car xml)) (equal? '@ (caar xml)))
-                 (attr (cdar xml) port)
-                 (child tag (cdr xml) port)]
-                [else
-                  (child tag xml port)])]))
-    (let-values ([(p get) (string->oport)])
-      (xml->string1 (car xml) (cdr xml) p)
+        [(null? ls) #f]
+        [else
+          (cond
+            [(atom? (car ls))
+             (put-string port (format "~a" (car ls)))]
+            [(eqv? '@ (caar ls))
+             (attr (cdar ls) port)
+             (if (null? (cdar ls))
+                 (put-string port "/>")
+                 (put-string port ">"))]
+            [else (node (car ls) port)])
+          (child (cdr ls) port)]))
+    (define (node ls port)
+      (let ([tag (car ls)] [children (cdr ls)])
+        (cond
+          [(eqv? tag '*TOP*) (child children port)]
+          [(eqv? tag '*PI*)
+           (put-string port (format "<?~a?>" (string-join children " ")))]
+          [(null? children)
+           (put-string port (format "<~a/>" tag))]
+          [else
+            (if (has-attr children)
+                (begin
+                  (put-string port (format "<~a" tag)))
+                (put-string port (format "<~a>" tag)))
+            (child children port)
+            (if (> (length children) 1)
+                (put-string port (format "</~a>" tag)))])))
+    (let-values ([(port get) (string->oport)])
+      (node xml port)
       (get)))
 
   (define (xml-ref xml path)
