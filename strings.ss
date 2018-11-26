@@ -1,10 +1,10 @@
 (library (strings)
   (export string-replace
-	  string-replace/all
-	  string-split
-	  string-join
-	  string->file
-	  file->string)
+      string-replace/all
+      string-split
+      string-join
+      string->file
+      file->string)
   
   (import (chezscheme) (irregex) (srfi private let-opt))
 
@@ -16,10 +16,10 @@
                 (loop (read-char) (cons x acc)))))))
 
   (define (string->file s filename)
-    (delete-file filename)
     (call-with-output-file filename
       (lambda (p)
-	(put-string p s))))
+        (put-string p s))
+      '(truncate)))
   
   (define string-replace
     (lambda (s s1 s2)
@@ -40,29 +40,29 @@
 ;;; to avoid non-R5RS dependencies.
 (define (string-concatenate strings)
   (let* ((total (do ((strings strings (cdr strings))
-		     (i 0 (+ i (string-length (format "~a" (car strings))))))
-		    ((not (pair? strings)) i)))
-	 (ans (make-string total)))
+             (i 0 (+ i (string-length (format "~a" (car strings))))))
+            ((not (pair? strings)) i)))
+     (ans (make-string total)))
     (let lp ((i 0) (strings strings))
       (if (pair? strings)
-	  (let* ((s (format "~a" (car strings)))
-		 (slen (string-length s)))
-	    (%string-copy! ans i s 0 slen)
-	    (lp (+ i slen) (cdr strings)))))
+      (let* ((s (format "~a" (car strings)))
+         (slen (string-length s)))
+        (%string-copy! ans i s 0 slen)
+        (lp (+ i slen) (cdr strings)))))
     ans))
 
 ;;; Library-internal routine
 (define (%string-copy! to tstart from fstart fend)
   (if (> fstart tstart)
       (do ((i fstart (+ i 1))
-	   (j tstart (+ j 1)))
-	  ((>= i fend))
-	(string-set! to j (string-ref from i)))
+       (j tstart (+ j 1)))
+      ((>= i fend))
+    (string-set! to j (string-ref from i)))
 
       (do ((i (- fend 1)                    (- i 1))
-	   (j (+ -1 tstart (- fend fstart)) (- j 1)))
-	  ((< i fstart))
-	(string-set! to j (string-ref from i)))))
+       (j (+ -1 tstart (- fend fstart)) (- j 1)))
+      ((< i fstart))
+    (string-set! to j (string-ref from i)))))
 
 
 ;;; (string-join string-list [delimiter grammar]) => string
@@ -82,36 +82,36 @@
 
 (define (string-join strings . delim+grammar)
   (let-optionals* delim+grammar ((delim " " (string? delim))
-				 (grammar 'infix))
+                 (grammar 'infix))
     (let ((buildit (lambda (lis final)
-		     (let recur ((lis lis))
-		       (if (pair? lis)
-			   (cons delim (cons (format "~a" (car lis)) (recur (cdr lis))))
-			   final)))))
+             (let recur ((lis lis))
+               (if (pair? lis)
+               (cons delim (cons (format "~a" (car lis)) (recur (cdr lis))))
+               final)))))
 
       (cond ((pair? strings)
-	     (string-concatenate
-	      (case grammar
+         (string-concatenate
+          (case grammar
 
-		((infix strict-infix)
-		 (cons (car strings) (buildit (cdr strings) '())))
+        ((infix strict-infix)
+         (cons (car strings) (buildit (cdr strings) '())))
 
-		((prefix) (buildit strings '()))
+        ((prefix) (buildit strings '()))
 
-		((suffix)
-		 (cons (car strings) (buildit (cdr strings) (list delim))))
+        ((suffix)
+         (cons (car strings) (buildit (cdr strings) (list delim))))
 
-		(else (error "Illegal join grammar"
-			     grammar string-join)))))
+        (else (error "Illegal join grammar"
+                 grammar string-join)))))
 
-	     ((not (null? strings))
-	      (error "STRINGS parameter not list." strings string-join))
+         ((not (null? strings))
+          (error "STRINGS parameter not list." strings string-join))
 
-	     ;; STRINGS is ()
+         ;; STRINGS is ()
 
-	     ((eq? grammar 'strict-infix)
-	      (error "Empty list cannot be joined with STRICT-INFIX grammar."
-		     string-join))
+         ((eq? grammar 'strict-infix)
+          (error "Empty list cannot be joined with STRICT-INFIX grammar."
+             string-join))
 
-	     (else "")))))		; Special-cased for infix grammar.
+         (else "")))))        ; Special-cased for infix grammar.
 )

@@ -76,6 +76,7 @@
           file->xml
           xml->file
           xml->string
+          xml-filter
           xml-ref
           )
 
@@ -268,7 +269,7 @@
 
   (define (xml->string xml)
     (define (has-attr cs)
-      (and (not (null? cs)) (not (null? (car cs))) (eqv? '@ (caar cs))))
+      (and (pair? cs) (pair? (car cs)) (eqv? '@ (caar cs))))
     (define (attr ls port)
       (cond
         [(null? ls) #f]
@@ -284,7 +285,7 @@
         [else
           (cond
             [(atom? (car ls))
-             (put-string port (format "~a" (car ls)))]
+             (put-string port (format "~a" (car ls)))] ; text
             [(eqv? '@ (caar ls))
              (attr (cdar ls) port)
              (if (null? (cdr ls))
@@ -306,13 +307,29 @@
                   (put-string port (format "<~a" tag)))
                 (put-string port (format "<~a>" tag)))
             (child children port)
-            (if (> (length children) 1)
+            (if (or (and (= (length children) 1) (not (has-attr children)))
+                    (> (length children) 1))
                 (put-string port (format "</~a>" tag)))])))
     (let-values ([(port get) (string->oport)])
       (node xml port)
       (get)))
 
-  (define (xml-ref xml path)
+  (define (xml-filter xml path)
     ((sxpath path) xml))
 
+  (define (xml-ref xml keys)
+    (define (%xml-ref xml keys)
+      (cond
+        [(null? xml) '()]
+        [(eq? (car xml) (car keys))
+         (if (null? (cdr keys))
+             xml
+             (%xml-ref (cdr xml) (cdr keys)))]
+        [(pair? (car xml))
+         (let ([v (%xml-ref (car xml) keys)])
+           (if (null? v)
+               (%xml-ref (cdr xml) keys)
+               v))]
+        [else '()]))
+    (%xml-ref (cdr xml) keys))
   )
