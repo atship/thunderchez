@@ -78,6 +78,8 @@
           xml->string
           xml-filter
           xml-ref
+
+          make-equal-hashtable
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
@@ -332,4 +334,9 @@
                v))]
         [else '()]))
     (%xml-ref (cdr xml) keys))
+
+    (define make-equal-hashtable
+      (case-lambda
+        [() (make-hashtable equal-hash equal?)]
+        [(size) (make-hashtable equal-hash equal? size)]))
   )
