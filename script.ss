@@ -80,10 +80,18 @@
           xml-ref
 
           make-equal-hashtable
+          list-append!
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
 
+  (define-syntax list-append!
+    (syntax-rules ()
+      [(_ e0 e1 ...) 
+        (if (null? e0)
+            (set! e0 (append! e0 e1 ...))
+            (append! e0 e1 ...))]))
+  
   (define (int i)
     (inexact->exact (round i)))
 
