@@ -30,6 +30,7 @@
           file->json
           string->json
           json->string
+          json->string2
 
           loge
           logw
@@ -347,4 +348,77 @@
       (case-lambda
         [() (make-hashtable equal-hash equal?)]
         [(size) (make-hashtable equal-hash equal? size)]))
+
+  (define json->string2
+    (case-lambda
+      [(json) (json->string2 json #f)]
+      [(json pretty) (json->string2 json pretty (if pretty "\"~s\": " "\"~s\":"))]
+      [(json pretty key-format)
+       (define (print-pretty pretty port lv)
+         (if pretty
+             (put-string port (format (format "\n~~,,~a@a" (* 2 lv)) ""))))
+       (define (value v port)
+         (cond
+           [(number? v)
+            (put-string port (format "~a" v))]
+           [(boolean? v)
+            (put-string port (if v "true" "false"))]
+           [else
+             (put-string port (format "\"~a\"" v))]))
+       (define (array lss port lv)
+         (cond
+           [(null? lss)
+            (put-string port "[]")]
+           [else
+             (put-string port "[")
+             (set! lv (+ 1 lv))
+             (print-pretty pretty port lv)
+             (let loop ([ls lss])
+               (let ([v (car ls)])
+                 (if (list? v)
+                     (parse v port lv)
+                     (value v port))
+                 (if (null? (cdr ls))
+                     (begin
+                       (print-pretty pretty port (- lv 1))
+                       (put-string port "]"))
+                     (begin
+                       (put-string port ",")
+                       (print-pretty pretty port lv)
+                       (loop (cdr ls))))))]))
+       (define (obj lss port lv)
+         (cond
+           [(null? lss)
+            (put-string port "{}")]
+           [else
+             (put-string port "{")
+             (set! lv (+ 1 lv))
+             (print-pretty pretty port lv)
+             (let loop ([ls lss])
+               (let ([k (car ls)]
+                     [v (cadr ls)])
+                 (put-string port (format key-format k))
+                 (if (list? v)
+                     (parse v port lv)
+                     (value v port))
+                 (if (null? (cddr ls))
+                     (begin
+                       (print-pretty pretty port (- lv 1))
+                       (put-string port "}"))
+                     (begin
+                       (put-string port ",")
+                       (print-pretty pretty port lv)
+                       (loop (cddr ls))))))]))
+       (define (parse ls port lv)
+         (cond
+           [(null? ls) (obj ls port lv)]
+           [(atom? (car ls))
+            (if (eq? '@ (car ls))
+                (array (cdr ls) port lv)
+                (obj ls port lv))]
+           [else
+             (println "error json format ~a" json)]))
+       (let-values ([(port get) (string->oport)])
+         (parse json port 0)
+         (get))]))
   )
