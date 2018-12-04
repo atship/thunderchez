@@ -351,7 +351,7 @@
 
   (define json->string2
     (case-lambda
-      [(json) (json->string2 json #f)]
+      [(json) (json->string2 json #t)]
       [(json pretty) (json->string2 json pretty (if pretty "\"~a\": " "\"~a\":"))]
       [(json pretty key-format)
        (define (print-pretty pretty port lv)
