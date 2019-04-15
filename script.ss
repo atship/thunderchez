@@ -82,10 +82,12 @@
 
           make-equal-hashtable
           list-append!
+
+	  mkdirp
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
-
+  
   (define-syntax list-append!
     (syntax-rules ()
       [(_ e0 e1 ...) 
@@ -264,6 +266,12 @@
     (let ([bytes (string->utf8 s)])
       (write-uint port (bytevector-length bytes))
       (write-bytes port bytes)))
+
+  (define (mkdirp dir)
+    (case (machine-type)
+      [(ta6nt a6nt i3nt ti3nt)
+       (shell "mkdir ~a" (string-replace/all dir "/" "\\"))]
+      [else (shell "mkdir -p ~a" dir)]))
 
   (define string->xml
     (case-lambda
