@@ -79,11 +79,20 @@
           xml->string
           xml-filter
           xml-ref
+          combine
+          left
+          right
+          create
+          first
+          second
+          third
+          forth
+          nth
 
           make-equal-hashtable
           list-append!
 
-	  mkdirp
+          mkdirs
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
@@ -94,6 +103,17 @@
         (if (null? e0)
             (set! e0 (append! e0 e1 ...))
             (append! e0 e1 ...))]))
+  (define-syntax create (identifier-syntax list))
+  (define-syntax left (identifier-syntax cons))
+  (define (right a b)
+    (reverse
+      (left a b)))
+  (define-syntax first (identifier-syntax car))
+  (define-syntax second (identifier-syntax cadr))
+  (define-syntax third (identifier-syntax caddr))
+  (define-syntax forth (identifier-syntax cadddr))
+  (define-syntax combine (identifier-syntax append))
+  (define-syntax nth (identifier-syntax list-ref))
   
   (define (int i)
     (inexact->exact (round i)))
@@ -267,7 +287,7 @@
       (write-uint port (bytevector-length bytes))
       (write-bytes port bytes)))
 
-  (define (mkdirp dir)
+  (define (mkdirs dir)
     (case (machine-type)
       [(ta6nt a6nt i3nt ti3nt)
        (shell "mkdir ~a" (string-replace/all dir "/" "\\"))]
