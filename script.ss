@@ -82,6 +82,7 @@
           combine
           left
           right
+          right!
           create
           first
           second
@@ -106,8 +107,9 @@
   (define-syntax create (identifier-syntax list))
   (define-syntax left (identifier-syntax cons))
   (define (right a b)
-    (reverse
-      (left a b)))
+    (combine b `(,a)))
+  (define (right! a b)
+    (append! b `(,a)))
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
   (define-syntax third (identifier-syntax caddr))
