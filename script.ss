@@ -79,6 +79,7 @@
           xml->string
           xml-filter
           xml-ref
+          map1
           combine
           left
           right
@@ -116,7 +117,20 @@
   (define-syntax forth (identifier-syntax cadddr))
   (define-syntax combine (identifier-syntax append))
   (define-syntax nth (identifier-syntax list-ref))
-  
+  (define map1
+    (lambda (f ls . more)
+      (if (null? more)
+          (let map2 ([ls ls])
+            (if (null? ls)
+                '()
+                (cons (f (car ls))
+                      (map2 (cdr ls)))))
+          (let map-more ([ls ls] [more more])
+            (if (null? ls)
+                '()
+                (cons
+                  (apply f (car ls) (map1 car more))
+                  (map-more (cdr ls) (map1 cdr more))))))))
   (define (int i)
     (inexact->exact (round i)))
 
