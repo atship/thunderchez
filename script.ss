@@ -84,6 +84,7 @@
           left
           right
           right!
+          list-set!
           create
           first
           second
@@ -117,6 +118,9 @@
   (define-syntax forth (identifier-syntax cadddr))
   (define-syntax combine (identifier-syntax append))
   (define-syntax nth (identifier-syntax list-ref))
+  (define (list-set! ls n v)
+    (set-car! (list-tail ls n) v)
+    ls)
   (define map1
     (lambda (f ls . more)
       (if (null? more)
