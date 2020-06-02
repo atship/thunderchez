@@ -85,6 +85,10 @@
           right
           right!
           list-set!
+	  list-insert!
+          list-remove!
+          make-head-list
+          normal-list
           create
           first
           second
@@ -121,6 +125,22 @@
   (define (list-set! ls n v)
     (set-car! (list-tail ls n) v)
     ls)
+  (define (list-insert! ls n v)
+    (if (<= n 0)
+      (error "list-insert!" (format "index ~a must > 0" n))
+      (begin
+        (set-cdr! (list-tail ls (- n 1)) (cons v (list-tail ls n)))
+        ls)))
+  (define (list-remove! ls n)
+    (if (or (not (list? ls)) (<= n 0) (>= n (length ls)))
+        (error "list-remove!" (format "index ~a must > 0 and < length(ls)" n))
+        (begin
+         (set-cdr! (list-tail ls (- n 1)) (list-tail ls (+ n 1)))
+         ls)))
+  (define (make-head-list)
+    '(*head*))
+  (define (normal-list hls)
+    (cdr hls))
   (define map1
     (lambda (f ls . more)
       (if (null? more)
