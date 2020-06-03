@@ -80,67 +80,60 @@
           xml-filter
           xml-ref
           map1
-          combine
-          left
-          right
-          right!
           list-set!
 	  list-insert!
           list-remove!
-          make-head-list
-          normal-list
-          create
           first
           second
           third
           forth
           nth
 
-          make-equal-hashtable
-          list-append!
+          make-hashmap
 
           mkdirs
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
   
-  (define-syntax list-append!
-    (syntax-rules ()
-      [(_ e0 e1 ...) 
-        (if (null? e0)
-            (set! e0 (append! e0 e1 ...))
-            (append! e0 e1 ...))]))
-  (define-syntax create (identifier-syntax list))
-  (define-syntax left (identifier-syntax cons))
-  (define (right a b)
-    (combine b `(,a)))
-  (define (right! a b)
-    (append! b `(,a)))
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
   (define-syntax third (identifier-syntax caddr))
   (define-syntax forth (identifier-syntax cadddr))
-  (define-syntax combine (identifier-syntax append))
   (define-syntax nth (identifier-syntax list-ref))
+
   (define (list-set! ls n v)
     (set-car! (list-tail ls n) v)
     ls)
+
   (define (list-insert! ls n v)
-    (if (<= n 0)
-      (error "list-insert!" (format "index ~a must > 0" n))
-      (begin
-        (set-cdr! (list-tail ls (- n 1)) (cons v (list-tail ls n)))
-        ls)))
+    (if (< (length ls) n)
+	(set! n (length ls)))
+    (cond
+     [(= n 0)
+      (set-cdr! ls (cons (car ls) (cdr ls)))
+      (set-car! ls v)
+      ls]
+     [(< n 0)
+      (list-insert! ls (+ 1 n (length ls)) v)]
+     [else
+      (set-cdr! (list-tail ls (- n 1)) (cons v (list-tail ls n)))
+      ls]))
+
   (define (list-remove! ls n)
-    (if (or (not (list? ls)) (<= n 0) (>= n (length ls)))
-        (error "list-remove!" (format "index ~a must > 0 and < length(ls)" n))
-        (begin
-         (set-cdr! (list-tail ls (- n 1)) (list-tail ls (+ n 1)))
-         ls)))
-  (define (make-head-list)
-    '(*head*))
-  (define (normal-list hls)
-    (cdr hls))
+    (if (<= (length ls) n)
+	(set! n (- (length ls) 1)))
+    (cond
+     [(= 0 n)
+      (set-car! ls (cadr ls))
+      (set-cdr! ls (cddr ls))
+      ls]
+     [(< n 0)
+      (list-remove! ls (+ n (length ls)))]
+     [else
+      (set-cdr! (list-tail ls (- n 1)) (list-tail ls (+ n 1)))
+      ls]))
+
   (define map1
     (lambda (f ls . more)
       (if (null? more)
@@ -155,6 +148,7 @@
                 (cons
                   (apply f (car ls) (map1 car more))
                   (map-more (cdr ls) (map1 cdr more))))))))
+
   (define (int i)
     (inexact->exact (round i)))
 
@@ -168,7 +162,17 @@
     (eval-string (format "~a" ls)))
 
   (define (shell f . args)
-    (system (apply format f args)))
+    (let* ([r (process (apply format f args))]
+	     [p (car r)]
+	     [pid (caddr r)])
+      (let loop ([rs ""]
+		 [rss (get-string-some p)])
+	(if (eof? rss)
+	    (begin
+	      (system (format "kill -9 ~a" pid))
+	      (string-split rs "\n"))
+	    (loop (string-append rs rss)
+		  (get-string-some p))))))
 
   (define (echo o . args)
     (printf "~a\n" o)
@@ -283,7 +287,7 @@
     (case-lambda
       [(port i) (write-short port i #f)]
       [(port i big) (let ([bytes (make-bytevector 2)])
-                      (bytevector-s16-set! bytes 0 i (if big 'big 'little))
+                      (bytevector-s16-set! bytes 0 i (if big 'big 'lnittle))
                       (write-bytes port bytes))]))
 
   (define write-ushort
@@ -412,10 +416,10 @@
         [else '()]))
     (%xml-ref (cdr xml) keys))
 
-    (define make-equal-hashtable
-      (case-lambda
-        [() (make-hashtable equal-hash equal?)]
-        [(size) (make-hashtable equal-hash equal? size)]))
+  (define make-hashmap
+    (case-lambda
+      [() (make-hashtable equal-hash equal?)]
+      [(size) (make-hashtable equal-hash equal? size)]))
 
   (define json->string2
     (case-lambda
