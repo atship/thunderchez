@@ -166,13 +166,13 @@
 	     [p (car r)]
 	     [pid (caddr r)])
       (let loop ([rs ""]
-		 [rss (get-string-some p)])
+		 [rss (get-string-all p)])
 	(if (eof? rss)
 	    (begin
 	      (system (format "kill -9 ~a" pid))
 	      (string-split rs "\n"))
 	    (loop (string-append rs rss)
-		  (get-string-some p))))))
+		  (get-string-all p))))))
 
   (define (echo o . args)
     (printf "~a\n" o)
