@@ -13,6 +13,7 @@
           string-join
           string->file
           file->string
+	  file->list
           file->utf8-iport
           file->utf8-oport
           file->iport
@@ -95,7 +96,17 @@
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
-  
+  (define file->list
+   (lambda (fname)
+    (let ([file (open-input-file fname)])
+      (let ([data
+             (let recurse ([decl (read file)])
+               (if (eof-object? decl)
+                 '()
+                 (cons decl (recurse (read file)))))])
+        (close-input-port file)
+	data))))
+
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
   (define-syntax third (identifier-syntax caddr))
