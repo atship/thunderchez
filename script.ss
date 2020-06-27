@@ -81,6 +81,8 @@
           xml-filter
           xml-ref
           map1
+	  list-append
+	  list-append!
           list-set!
 	  list-insert!
           list-remove!
@@ -116,6 +118,13 @@
   (define (list-set! ls n v)
     (set-car! (list-tail ls n) v)
     ls)
+  (define (list-append a . b)
+    (append a b))
+  (define (list-append! a . b)
+    (for-each
+     (lambda (x)
+       (list-insert! a -1 x))
+     b))
 
   (define (list-insert! ls n v)
     (if (< (length ls) n)
