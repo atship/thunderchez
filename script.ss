@@ -33,6 +33,9 @@
           json->string
           json->string2
 
+          A
+          C
+
           loge
           logw
           logi
@@ -97,7 +100,7 @@
           mkdirs
           )
 
-  (import (chezscheme) (strings) (ejson) (xtool) (matchable) (sxml))
+  (import (chezscheme) (strings) (ejson) (xtool) (matchable) (math comb) (sxml))
   (define file->list
    (lambda (fname)
     (let ([file (open-input-file fname)])
