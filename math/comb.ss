@@ -24,6 +24,8 @@
 	(f 1 n (- n (- m 1)))))
 
   (define (C n m)
+    (if (< (/ n 2) m)
+      (set! m (- n m)))
     (/ (A n m)
        (A m m)))
   )
