@@ -35,6 +35,8 @@
 
           A
           C
+	  AA
+	  CC
 
           loge
           logw
