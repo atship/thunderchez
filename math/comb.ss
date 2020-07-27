@@ -4,6 +4,7 @@
    C
    AA
    CC
+   P
    factorial)
   (import (chezscheme))
 
@@ -14,6 +15,19 @@
 	  (S (* r n) (- n 1))))
     (S 1 n))
 
+  (define (P l r . z)
+    (define (combine l r kons)
+      (apply append (map (lambda (x)
+	      (map (lambda (y)
+		     (kons x `(,y)))
+		   r))
+	    l)))
+    (let ([r (combine l r cons)])
+      (for-each (lambda (x)
+		  (set! r (combine r x append)))
+		z)
+      r))
+  
   (define (A n m)
     (define (f r n e)
       (if (<= n e)
