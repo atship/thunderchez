@@ -12,6 +12,7 @@
           string-split
           string-join
           string->file
+          include-file
           file->string
 	  file->list
           file->utf8-iport
@@ -37,7 +38,7 @@
           C
 	  AA
 	  CC
-    P
+          P
 
           loge
           logw
@@ -114,6 +115,8 @@
                  (cons decl (recurse (read file)))))])
         (close-input-port file)
 	data))))
+  (define (include-file f)
+     (eval-string (file->string f)))
 
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
