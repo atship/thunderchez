@@ -64,6 +64,7 @@
           read-short
           read-ushort
           read-byte
+          read-bool
           read-ubyte
           read-utf8
           read-float
@@ -76,6 +77,7 @@
           write-ushort
           write-short
           write-ubyte
+          write-bool
           write-byte
           write-float
           write-double
@@ -116,7 +118,7 @@
         (close-input-port file)
 	data))))
   (define (include-file f)
-     (eval-string (file->string f)))
+     (for-each (lambda (x) (eval x)) (file->list f)))
 
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
@@ -271,6 +273,9 @@
   (define (read-byte port)
     (bytevector-s8-ref (read-bytes port 1) 0))
 
+  (define (read-bool port)
+    (= 0 (bytevector-s8-ref (read-bytes port 1) 0)))
+
   (define (read-ubyte port)
     (bytevector-u8-ref (read-bytes port 1) 0))
 
@@ -316,7 +321,7 @@
     (case-lambda
       [(port i) (write-short port i #f)]
       [(port i big) (let ([bytes (make-bytevector 2)])
-                      (bytevector-s16-set! bytes 0 i (if big 'big 'lnittle))
+                      (bytevector-s16-set! bytes 0 i (if big 'big 'little))
                       (write-bytes port bytes))]))
 
   (define write-ushort
@@ -329,6 +334,11 @@
   (define (write-byte port b)
     (let ([bytes (make-bytevector 1)])
       (bytevector-s8-set! bytes 0 b)
+      (write-bytes port bytes)))
+
+(define (write-bool port b)
+    (let ([bytes (make-bytevector 1)])
+      (bytevector-s8-set! bytes 0 (if b 1 0))
       (write-bytes port bytes)))
 
   (define (write-ubyte port b)
