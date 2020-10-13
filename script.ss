@@ -11,10 +11,16 @@
           string-replace/all
           string-split
           string-join
+          string-starts?
+          string-starts-ci?
+          string-ends?
+          string-ends-ci?
           string->file
           include-file
           file->string
 	  file->list
+    file->bytes
+    walkdir
           file->utf8-iport
           file->utf8-oport
           file->iport
@@ -107,6 +113,20 @@
           )
 
   (import (chezscheme) (strings) (ejson) (xtool) (matchable) (math comb) (sxml))
+  (define (walkdir dir fun)
+    (let ([cdir (cd)])
+      (cd dir)
+      (let ([fs (shell "ls | sort -V")])
+        (for-each (lambda(f i)
+                    (if (file-directory? f)
+                      (walkdir f fun)
+                      (fun f i)))
+             fs (iota (length fs))))
+      (cd cdir)))
+  (define (file->bytes f)
+    (letrec* ([ff (file->iport f)] [bytes (get-bytevector-all ff)])
+      (close-port ff)
+      bytes))
   (define file->list
    (lambda (fname)
     (let ([file (open-input-file fname)])

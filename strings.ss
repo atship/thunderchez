@@ -1,26 +1,76 @@
+#!chezscheme
 (library (strings)
          (export string-replace
                  string-replace/all
                  string-split
                  string-join
                  string->file
+                 string-starts?
+                 string-starts-ci?
+                 string-ends?
+                 string-ends-ci?
                  file->string)
 
          (import (chezscheme) (irregex) (srfi private let-opt))
 
+         (define (string-starts? pattern str)
+           (let loop ((i 0))
+             (cond
+               ((>= i (string-length pattern)) #t)
+               ((>= i (string-length str)) #f)
+               ((char=? (string-ref pattern i) (string-ref str i))
+                (loop (+ 1 i)))
+               (else #f))))
+
+         (define (string-starts-ci? pattern str)
+           (let loop ((i 0))
+             (cond
+               ((>= i (string-length pattern)) #t)
+               ((>= i (string-length str)) #f)
+               ((char-ci=? (string-ref pattern i) (string-ref str i))
+                (loop (+ 1 i)))
+               (else #f))))
+
+         ; -- procedure+: string-suffix? PATTERN STRING
+         ; -- procedure+: string-suffix-ci? PATTERN STRING
+         ; checks to make sure that PATTERN is a suffix of STRING
+         ;
+         ;          (string-suffix? "ate" "pirate")             =>  #t
+         ;          (string-suffix? "rag" "outrage")            =>  #f
+         ;          (string-suffix? "" any-string)              =>  #t
+         ;          (string-suffix? any-string any-string)      =>  #t
+
+         (define (string-ends? pattern str)
+           (let loop ((i (1- (string-length pattern))) (j (1- (string-length str))))
+             (cond
+               ((negative? i) #t)
+               ((negative? j) #f)
+               ((char=? (string-ref pattern i) (string-ref str j))
+                (loop (1- i) (1- j)))
+               (else #f))))
+
+         (define (string-ends-ci? pattern str)
+           (let loop ((i (1- (string-length pattern))) (j (1- (string-length str))))
+             (cond
+               ((negative? i) #t)
+               ((negative? j) #f)
+               ((char-ci=? (string-ref pattern i) (string-ref str j))
+                (loop (1- i) (1- j)))
+               (else #f))))
+
          (define (file->string filename)
            (call-with-input-file filename
-             (lambda (p)
-               (get-string-all p))))
+                                 (lambda (p)
+                                   (get-string-all p))))
 
          (define string->file
            (case-lambda
              [(s filename) (string->file s filename 'truncate)]
              [(s filename opt)
               (call-with-output-file filename
-                (lambda (p)
-                  (put-string p s))
-                `(,opt))]))
+                                     (lambda (p)
+                                       (put-string p s))
+                                     `(,opt))]))
 
          (define string-replace
            (lambda (s s1 s2)
@@ -42,28 +92,28 @@
          (define (string-concatenate strings)
            (let* ((total (do ((strings strings (cdr strings))
                               (i 0 (+ i (string-length (format "~a" (car strings))))))
-                             ((not (pair? strings)) i)))
+                           ((not (pair? strings)) i)))
                   (ans (make-string total)))
              (let lp ((i 0) (strings strings))
                (if (pair? strings)
-                   (let* ((s (format "~a" (car strings)))
-                          (slen (string-length s)))
-                     (%string-copy! ans i s 0 slen)
-                     (lp (+ i slen) (cdr strings)))))
+                 (let* ((s (format "~a" (car strings)))
+                        (slen (string-length s)))
+                   (%string-copy! ans i s 0 slen)
+                   (lp (+ i slen) (cdr strings)))))
              ans))
 
          ;;; Library-internal routine
          (define (%string-copy! to tstart from fstart fend)
            (if (> fstart tstart)
-               (do ((i fstart (+ i 1))
-                    (j tstart (+ j 1)))
-                   ((>= i fend))
-                 (string-set! to j (string-ref from i)))
+             (do ((i fstart (+ i 1))
+                  (j tstart (+ j 1)))
+               ((>= i fend))
+               (string-set! to j (string-ref from i)))
 
-               (do ((i (- fend 1) (- i 1))
-                    (j (+ -1 tstart (- fend fstart)) (- j 1)))
-                   ((< i fstart))
-                 (string-set! to j (string-ref from i)))))
+             (do ((i (- fend 1) (- i 1))
+                  (j (+ -1 tstart (- fend fstart)) (- j 1)))
+               ((< i fstart))
+               (string-set! to j (string-ref from i)))))
 
 
          ;;; (string-join string-list [delimiter grammar]) => string
@@ -87,8 +137,8 @@
                            (let ((buildit (lambda (lis final)
                                             (let recur ((lis lis))
                                               (if (pair? lis)
-                                                  (cons delim (cons (format "~a" (car lis)) (recur (cdr lis))))
-                                                  final)))))
+                                                (cons delim (cons (format "~a" (car lis)) (recur (cdr lis))))
+                                                final)))))
 
                              (cond ((pair? strings)
                                     (string-concatenate
