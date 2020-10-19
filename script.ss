@@ -73,9 +73,11 @@
           read-bool
           read-ubyte
           read-utf8
+          read-sym
           read-float
           read-double
           write-utf8
+          write-sym
           write-uint
           write-int
           write-ulong
@@ -380,10 +382,16 @@
                       (bytevector-ieee-double-set! bytes 0 f (if big 'big 'little))
                       (write-bytes port bytes))]))
 
+  (define (read-sym port)
+    (string->symbol (read-utf8 port)))
+
   (define read-utf8
     (case-lambda
       [(port) (let ([len (read-uint port)]) (read-utf8 port len))]
       [(port len) (utf8->string (read-bytes port len))]))
+
+  (define (write-sym port s)
+    (write-utf8 port (symbol->string s)))
 
   (define (write-utf8 port s)
     (let ([bytes (string->utf8 s)])
