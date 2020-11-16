@@ -92,6 +92,7 @@
           write-float
           write-double
           eof?
+          eof
 
           string->xml
           file->xml
@@ -258,6 +259,7 @@
   (define (file->oport f)
     (open-file-output-port f (file-options replace) 'block))
 
+  (define-syntax eof (identifier-syntax eof-object))
   (define (eof? f)
     (if (port? f)
       (port-eof? f)
