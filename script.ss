@@ -28,6 +28,7 @@
           file-iclose
           file-oclose
           fclose
+          fopen
           string->iport
           string->oport
           string->code
@@ -143,6 +144,15 @@
   (define (include-file f)
      (for-each (lambda (x) (eval x)) (file->list f)))
 
+  (define fopen
+    (case-lambda
+      [(f) (fopen f 'r)]
+      [(f r?)
+       (case r?
+         [r (file->utf8-iport f)]
+         [rb (file->iport f)]
+         [w (file->utf8-oport f)]
+         [wb (file->oport f)])]))
   (define-syntax fclose (identifier-syntax close-port))
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
@@ -248,7 +258,10 @@
   (define (file->oport f)
     (open-file-output-port f (file-options replace) 'block))
 
-  (define-syntax eof? (identifier-syntax eof-object?))
+  (define (eof? f)
+    (if (port? f)
+      (port-eof? f)
+      (eof-object? f)))
 
   (define-syntax file-iclose (identifier-syntax close-input-port))
 
