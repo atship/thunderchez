@@ -27,6 +27,7 @@
           file->oport
           file-iclose
           file-oclose
+          fclose
           string->iport
           string->oport
           string->code
@@ -142,6 +143,7 @@
   (define (include-file f)
      (for-each (lambda (x) (eval x)) (file->list f)))
 
+  (define-syntax fclose (identifier-syntax close-port))
   (define-syntax first (identifier-syntax car))
   (define-syntax second (identifier-syntax cadr))
   (define-syntax third (identifier-syntax caddr))
