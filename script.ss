@@ -111,6 +111,8 @@
           third
           forth
           nth
+          ++
+          --
 
           make-hashmap
 
@@ -160,6 +162,8 @@
   (define-syntax third (identifier-syntax caddr))
   (define-syntax forth (identifier-syntax cadddr))
   (define-syntax nth (identifier-syntax list-ref))
+  (define-syntax ++ (identifier-syntax 1+))
+  (define-syntax -- (identifier-syntax 1-))
 
   (define (list-set! ls n v)
     (set-car! (list-tail ls n) v)
