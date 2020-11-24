@@ -100,7 +100,7 @@
           xml->string
           xml-filter
           xml-ref
-          map1
+          for
 	  list-append
 	  list-append!
           list-set!
@@ -204,7 +204,7 @@
       (set-cdr! (list-tail ls (- n 1)) (list-tail ls (+ n 1)))
       ls]))
 
-  (define map1
+  (define for
     (lambda (f ls . more)
       (if (null? more)
           (let map2 ([ls ls])
@@ -216,8 +216,8 @@
             (if (null? ls)
                 '()
                 (cons
-                  (apply f (car ls) (map1 car more))
-                  (map-more (cdr ls) (map1 cdr more))))))))
+                  (apply f (car ls) (for car more))
+                  (map-more (cdr ls) (for cdr more))))))))
 
   (define (int i)
     (inexact->exact (round i)))
