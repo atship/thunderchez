@@ -29,8 +29,14 @@
   (define (obj)
     (make-list 1 '$obj$))
 
-  (define (array)
-    (make-list 1 '$array$))
+  (define array
+    (case-lambda
+      [() (make-list 1 '$array$)]
+      [(l) (array l 0)]
+      [(l v) 
+       (let ([a (make-list (+ 1 l) v)])
+         (set-car! a '$array$)
+         a)]))
 
   (define (array-for a f)
     (for-each f (iota (length (cdr a))) (cdr a)))
