@@ -2,6 +2,7 @@
   (object)
   (export
     obj
+    obj->list
     obj-has?; o k
     obj-ref; o k
     obj-set! ; o k v
@@ -18,6 +19,7 @@
     array-pop
     array-in
     array-out
+    array->list
     empty?
     )
   (import (chezscheme) (script))
@@ -28,6 +30,12 @@
 
   (define (obj)
     (make-list 1 '$obj$))
+
+  (define (obj->list o)
+    (cdr o))
+
+  (define (array->list a)
+    (cdr a))
 
   (define array
     (case-lambda
