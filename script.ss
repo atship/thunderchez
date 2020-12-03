@@ -101,6 +101,7 @@
           xml-filter
           xml-ref
           for
+          list-index
 	  list-append
 	  list-append!
           list-set!
@@ -165,6 +166,12 @@
   (define-syntax ++ (identifier-syntax 1+))
   (define-syntax -- (identifier-syntax 1-))
 
+  (define (list-index ls v)
+    (exists (lambda (x i)
+              (if (equal? v x)
+                i
+                #f))
+            ls (iota (length ls))))
   (define (list-set! ls n v)
     (set-car! (list-tail ls n) v)
     ls)
