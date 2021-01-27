@@ -383,7 +383,7 @@
 
   (define (write-byte port b)
     (let ([bytes (make-bytevector 1)])
-      (bytevector-s8-set! bytes 0 b)
+      (bytevector-s8-set! bytes 0 (if (char? b) (char->integer b) b))
       (write-bytes port bytes)))
 
 (define (write-bool port b)
@@ -393,7 +393,7 @@
 
   (define (write-ubyte port b)
     (let ([bytes (make-bytevector 1)])
-      (bytevector-u8-set! bytes 0 b)
+      (bytevector-u8-set! bytes 0 (if (char? b) (char->integer b) b))
       (write-bytes port bytes)))
 
   (define write-float
